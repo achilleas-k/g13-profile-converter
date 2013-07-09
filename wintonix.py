@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import sys
 
 filename = sys.argv[1] # TODO: check arguments
 
@@ -13,7 +14,7 @@ for pchild in profile:
         macros_elems = pchild
     elif "assignments" in pchild.tag:
         assignments_elems = pchild
-    elif "backlight" in pchild.tags:
+    elif "backlight" in pchild.tag:
         backlight_elems = pchild
 
 macros = []
@@ -21,7 +22,9 @@ for macro_el in macros_elems:
     newmacro = {}
     newmacro['name'] = macro_el.get('name')
     newmacro['guid'] = macro_el.get('guid')
-    newmacro['key'] = macro_el.getchildren()[0].getchildren()[0].get('value')
+    for mec in macro_el.getchildren():
+        for mecc in mec.getchildren():
+            newmacro['key'] = mecc.get('value')
                         # ^^^ ugly, but works
     macros.append(newmacro)
 
@@ -30,7 +33,10 @@ for assign_el in assignments_elems:
     newassign = {}
     newassign['gkey'] = assign_el.get('contextid')
     newassign['macroguid'] = assign_el.get('macroguid')
-    assignments = newassign
+    assignments.append(newassign)
+
+
+# sort both dictionary lists by GUID
 
 
 
