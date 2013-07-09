@@ -23,7 +23,14 @@ for macro_el in macros_elems:
     newmacro['guid'] = macro_el.get('guid')
     newmacro['key'] = macro_el.getchildren()[0].getchildren()[0].get('value')
                         # ^^^ ugly, but works
+    macros.append(newmacro)
 
+assignments = []
+for assign_el in assignments_elems:
+    newassign = {}
+    newassign['gkey'] = assign_el.get('contextid')
+    newassign['macroguid'] = assign_el.get('macroguid')
+    assignments = newassign
 
 
 
