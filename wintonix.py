@@ -38,12 +38,16 @@ for assign_el in assignments_elems:
     newassign['guid'] = assign_el.get('macroguid')
     assignments.append(newassign)
 
+print("Building indexers ...")
+macro_indexer = dict((macro['guid'], i) for i, macro in enumerate(macros))
+assign_indexer = dict((assign['guid'], i) for i, assign in enumerate(assignments))
 
-# sort both dictionary lists by GUID
-macros = sorted(macros, key=lambda macro : macro.get('guid'))
-assignments = sorted(assignments, key=lambda assign : assign.get('guid'))
 
-
+print("Merging lists ...")
+target_assignments = []
+for assign in assignments:
+    guid = assign['guid']
+    
 
 
 
