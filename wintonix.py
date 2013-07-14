@@ -3,6 +3,7 @@ import sys
 
 filename = sys.argv[1] # TODO: check arguments
 
+print("\n\nParsing %s" % filename)
 tree = ET.parse(filename)
 root = tree.getroot()
 
@@ -17,6 +18,7 @@ for pchild in profile:
     elif "backlight" in pchild.tag:
         backlight_elems = pchild
 
+print("Building macro list ...")
 macros = []
 for macro_el in macros_elems:
     newmacro = {}
@@ -28,16 +30,18 @@ for macro_el in macros_elems:
                         # ^^^ ugly, but works
     macros.append(newmacro)
 
+print("Building assingment list ...")
 assignments = []
 for assign_el in assignments_elems:
     newassign = {}
     newassign['gkey'] = assign_el.get('contextid')
-    newassign['macroguid'] = assign_el.get('macroguid')
+    newassign['guid'] = assign_el.get('macroguid')
     assignments.append(newassign)
 
 
 # sort both dictionary lists by GUID
-
+macros = sorted(macros, key=lambda macro : macro.get('guid'))
+assignments = sorted(assignments, key=lambda assign : assign.get('guid'))
 
 
 
