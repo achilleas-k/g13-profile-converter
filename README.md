@@ -14,7 +14,7 @@ manager.
 The script generates a file called `profile.macros`, which should be zipped,
 renamed from `profile.zip` to `profile.mzip` and imported into g15-config.
 
-The script only handles the M1 bindings and does not transfer the profile
+The script only handles the M1 bindings and does not transfer the backlight
 colour. Also, all key bindings are assumed to be keyboard keys (no macros or
 custom delays supported yet).
 
