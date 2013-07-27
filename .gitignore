@@ -39,3 +39,5 @@ nosetests.xml
 *.macros
 *.xml
 
+# vim swap files
+*.swp
