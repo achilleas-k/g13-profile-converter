@@ -131,10 +131,10 @@ def save_macro_file(filename, macros_file_text):
     print("Writing Linux .macros file ...")
     # TODO: Ask about overwriting or supplying new name
     output_file_name_base = os.path.splitext(filename)[0]
-    output_file_name = output_file_name_base
+    output_file_name = output_file_name_base+".macros"
     while os.path.exists(output_file_name):
         print("WARNING: file \"%s\" already exists: " % (output_file_name))
-        overwrite = ""
+        overwrite = "_"
         while overwrite not in "yYnN":
             overwrite = raw_input("Overwrite file? [y/n] ")
         if overwrite in "nN":
@@ -154,7 +154,7 @@ if __name__=="__main__":
     assignments = get_assignments(assignments_elem)
     macro_assignments = assign_macros(macros, assignments)
     profile_name = elements['pname']
-    file_contents = build_macro_file_text(profile_name, assignments)
+    file_contents = build_macro_file_text(profile_name, macro_assignments)
     save_macro_file(filename, file_contents)
 
 
