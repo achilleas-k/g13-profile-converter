@@ -23,7 +23,7 @@ def get_elements(filename):
             'pid': profile_id,
             'macros': macros_elem,
             'assignments': assignments_elem,
-            'baclight': backlight_elem,
+            'backlight': backlight_elem,
             }
 
 def get_macros(macros_elem):
@@ -62,7 +62,9 @@ def assign_macros(macros, assignments):
             continue
         cur_macro = macros[mindex]
         cur_gkey = assign['gkey'].lower()
-        cur_kkey = cur_macro['key']
+        if 'key' in cur_macro:
+            # macro may not be assigned to key
+            cur_kkey = cur_macro['key']
         cur_name = cur_macro['name']
         cur_type = "mapped-to-key" # only mapped-to-key supported for now
         cur_maptype = "keyboard"  # only keyboard supported for now
