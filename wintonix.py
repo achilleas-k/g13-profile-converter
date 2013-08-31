@@ -80,7 +80,7 @@ def assign_macros(macros, assignments):
         cur_gkey = assign['gkey'].lower()
         if 'key' in cur_macro:
             # macro may not be assigned to key
-            cur_kkey = cur_macro['key']
+            cur_kkey = "KEY_"+cur_macro['key']
         cur_name = cur_macro['name']
         cur_type = "mapped-to-key" # only mapped-to-key supported for now
         cur_maptype = "keyboard"  # only keyboard supported for now
