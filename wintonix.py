@@ -27,6 +27,9 @@ def get_elements(filename):
     profile = root[0]
     profile_name = profile.attrib['name']
     profile_id = profile.attrib['guid']
+    macros_elem = None
+    assignments_elem = None
+    backlight_elem = None
     for pchild in profile:
         if "macros" in pchild.tag:
             macros_elem = pchild
@@ -78,7 +81,7 @@ def assign_macros(macros, assignments):
             continue
         cur_macro = macros[mindex]
         cur_gkey = assign['gkey'].lower()
-        if 'key' in cur_macro:
+        if 'key' in cur_macro and cur_macro['key'] is not None:
             # macro may not be assigned to key
             cur_kkey = "KEY_"+cur_macro['key']
         cur_name = cur_macro['name']
