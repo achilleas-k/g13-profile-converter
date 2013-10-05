@@ -1,4 +1,4 @@
-g13wintonix
+g13-profile-migrator
 ===========
 
 Windows to Linux profile migration tool for Logitech G13 gameboard.  Converts
