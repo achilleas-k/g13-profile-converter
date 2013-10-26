@@ -13,10 +13,27 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
 """
 import xml.etree.ElementTree as ET
 import sys
 import os.path
+
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+KEYDEF_FILE = os.path.join(SCRIPT_DIR, "keydef.cfg")
+KEYDEF = {}
+
+def load_keydef(KEYDEF_FILE):
+    deflines = open(KEYDEF_FILE, 'r').readlines()  # TODO: Check if file exists
+    for dl in deflines:
+        dl = dl.strip()
+        if dl.startswith("#") or not dl:
+            continue
+        winkey, linuxkey = dl.split(':')
+        winkey = winkey.strip()
+        linuxkey = linuxkey.strip()
+        KEYDEF[winkey] = linuxkey
+    return
 
 
 def get_elements(filename):
@@ -83,11 +100,11 @@ def assign_macros(macros, assignments):
         cur_gkey = assign['gkey'].lower()
         if 'key' in cur_macro and cur_macro['key'] is not None:
             # macro may not be assigned to key
-            cur_kkey = "KEY_"+cur_macro['key']
+            cur_kkey = KEYDEF[cur_macro['key']]
         cur_name = cur_macro['name']
         cur_type = "mapped-to-key" # only mapped-to-key supported for now
+        # TODO: support non-keyboard type mappings
         cur_maptype = "keyboard"  # only keyboard supported for now
-        # TODO: keyboard key translation required -- build a file with associations
         configstring =  ("keys_%s_name = %s\n"
                         "keys_%s_type = %s\n"
                         "keys_%s_maptype = %s\n"
@@ -135,7 +152,7 @@ def build_macro_file_text(profile_name, assignments):
                 "[m3-1]\n"
                 "\n"
                 "[m1-2]\n"
-                "backlight_color = 11,0,255\n"
+                "backlight_color = 11,0,255\n" # TODO: Why is this here?
                 "\n"
                 "[m2-2]\n"
                 "\n"
@@ -143,8 +160,6 @@ def build_macro_file_text(profile_name, assignments):
                 "\n\n"
             )
     return macros_file_text
-
-
 
 def save_macro_file(filename, macros_file_text):
     print("Writing Linux .macros file ...")
@@ -165,7 +180,8 @@ def save_macro_file(filename, macros_file_text):
     print("Profile written to \"%s\"" % output_file_name)
 
 if __name__=="__main__":
-    filename = sys.argv[1] # TODO: check cl arguments
+    filename = sys.argv[1]  # TODO: check cl arguments
+    load_keydef(KEYDEF_FILE)  # TODO: optional file???
     elements = get_elements(filename)
     macros_elem = elements['macros']
     macros = get_macros(macros_elem)
