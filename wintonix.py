@@ -104,6 +104,7 @@ def assign_macros(macros, assignments):
             continue
         cur_macro = macros[mindex]
         cur_gkey = assign['gkey'].lower()
+        cur_kkey = ''
         if 'keyseq' in cur_macro and cur_macro['keyseq'] is not None\
                 and "keystroke" in cur_macro['type']:
             # macro may not be assigned to key sequence
@@ -113,18 +114,20 @@ def assign_macros(macros, assignments):
                 cur_kkey = KEYDEF[firstkey]
             else:
                 cur_kkey = "KEY_"+firstkey
-        cur_name = cur_macro['name']
-        # TODO: Handle different types
-        cur_type = "mapped-to-key"
-        cur_maptype = "keyboard"
-        configstring =  ("keys_%s_name = %s\n"
-                        "keys_%s_type = %s\n"
-                        "keys_%s_maptype = %s\n"
-                        "keys_%s_mappedkey = %s\n" % (cur_gkey, cur_name,
-                                                        cur_gkey, cur_type,
-                                                        cur_gkey, cur_maptype,
-                                                        cur_gkey, cur_kkey))
-        target_assignments.append(configstring)
+            cur_name = cur_macro['name']
+            # TODO: Handle different types
+            cur_type = "mapped-to-key"
+            cur_maptype = "keyboard"
+            configstring =  (
+                    "keys_%s_name = %s\n"
+                    "keys_%s_type = %s\n"
+                    "keys_%s_maptype = %s\n"
+                    "keys_%s_mappedkey = %s\n" % (cur_gkey, cur_name,
+                                                    cur_gkey, cur_type,
+                                                    cur_gkey, cur_maptype,
+                                                    cur_gkey, cur_kkey)
+                    )
+            target_assignments.append(configstring)
     return target_assignments
 
 def build_macro_file_text(profile_name, assignments):
