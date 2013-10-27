@@ -40,7 +40,6 @@ def get_elements(filename):
     print("\n\nParsing %s" % filename)
     tree = ET.parse(filename)
     root = tree.getroot()
-
     profile = root[0]
     profile_name = profile.attrib['name']
     profile_id = profile.attrib['guid']
@@ -70,8 +69,15 @@ def get_macros(macros_elem):
         newmacro['name'] = macro_el.get('name')
         newmacro['guid'] = macro_el.get('guid')
         for mec in macro_el.getchildren():
+            newmacro['type'] = mec.tag
+            newmacro['keyseq'] = []
+            # TODO: separate types:
+            #       - keystroke
+            #       - multikey
+            #       - textblock
+            #       - mousefunction
             for mecc in mec.getchildren():
-                newmacro['key'] = mecc.get('value')
+                newmacro['keyseq'].append(mecc.get('value'))
         macros.append(newmacro)
     return macros
 
@@ -98,13 +104,19 @@ def assign_macros(macros, assignments):
             continue
         cur_macro = macros[mindex]
         cur_gkey = assign['gkey'].lower()
-        if 'key' in cur_macro and cur_macro['key'] is not None:
-            # macro may not be assigned to key
-            cur_kkey = KEYDEF[cur_macro['key']]
+        if 'keyseq' in cur_macro and cur_macro['keyseq'] is not None\
+                and "keystroke" in cur_macro['type']:
+            # macro may not be assigned to key sequence
+            # NOTE: Just taking the first one for now
+            firstkey = cur_macro['keyseq'][0]
+            if KEYDEF.has_key(firstkey):
+                cur_kkey = KEYDEF[firstkey]
+            else:
+                cur_kkey = "KEY_"+firstkey
         cur_name = cur_macro['name']
-        cur_type = "mapped-to-key" # only mapped-to-key supported for now
-        # TODO: support non-keyboard type mappings
-        cur_maptype = "keyboard"  # only keyboard supported for now
+        # TODO: Handle different types
+        cur_type = "mapped-to-key"
+        cur_maptype = "keyboard"
         configstring =  ("keys_%s_name = %s\n"
                         "keys_%s_type = %s\n"
                         "keys_%s_maptype = %s\n"
@@ -140,6 +152,7 @@ def build_macro_file_text(profile_name, assignments):
     for ta in assignments:
         macros_file_text += ta
     # TODO: Grab backlight colour too
+    # TODO: Grab shiftstate from XML -> M{1,2,3}
     macros_file_text += (
                 "[m2]\n"
                 "\n"
@@ -181,7 +194,7 @@ def save_macro_file(filename, macros_file_text):
 
 if __name__=="__main__":
     filename = sys.argv[1]  # TODO: check cl arguments
-    load_keydef(KEYDEF_FILE)  # TODO: optional file???
+    load_keydef(KEYDEF_FILE)
     elements = get_elements(filename)
     macros_elem = elements['macros']
     macros = get_macros(macros_elem)
