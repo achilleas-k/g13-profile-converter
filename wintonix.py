@@ -89,6 +89,7 @@ def get_assignments(assignments_elem):
     for assign_el in assignments_elem:
         newassign = {}
         newassign['gkey'] = assign_el.get('contextid')
+        newassign['bank'] = 'm'+assign_el.get('shiftstate')
         newassign['guid'] = assign_el.get('macroguid')
         assignments.append(newassign)
     return assignments
@@ -97,7 +98,7 @@ def assign_macros(macros, assignments):
     macro_indexer = dict((macro['guid'], i) for i, macro in enumerate(macros))
     #assign_indexer = dict((assign['guid'], i) for i, assign in enumerate(assignments))
     print("Merging lists ...")
-    target_assignments = []
+    target_assignments = {'m1': '', 'm2': '', 'm3': ''}
     for assign in assignments:
         guid = assign['guid']
         mindex = macro_indexer.get(guid)
@@ -106,9 +107,9 @@ def assign_macros(macros, assignments):
             continue
         cur_macro = macros[mindex]
         cur_gkey = assign['gkey'].lower()
+        bank = assign['bank']
         cur_kkey = ''
-        if 'keyseq' in cur_macro and cur_macro['keyseq'] is not None\
-                and "keystroke" in cur_macro['type']:
+        if 'keyseq' in cur_macro and cur_macro['keyseq'][0] is not None:
             # macro may not be assigned to key sequence
             # NOTE: Just taking the first one for now
             firstkey = cur_macro['keyseq'][0]
@@ -129,7 +130,8 @@ def assign_macros(macros, assignments):
                                                     cur_gkey, cur_maptype,
                                                     cur_gkey, cur_kkey)
                     )
-            target_assignments.append(configstring)
+
+            target_assignments[bank]+=configstring
     return target_assignments
 
 def build_macro_file_text(profile_name, assignments):
@@ -152,15 +154,14 @@ def build_macro_file_text(profile_name, assignments):
                 "release_delay = 50\n"+
                 "models = g13\n"+
                 "\n"+
-                "[m1]\n")
-    for ta in assignments:
-        macros_file_text += ta
+                "[m1]\n"+
+                assignments['m1']+
+                "[m2]\n"+
+                assignments['m2']+
+                "[m3]\n"+
+                assignments['m3']+
+
     # TODO: Grab backlight colour too
-    # TODO: Grab shiftstate from XML -> M{1,2,3}
-    macros_file_text += (
-                "[m2]\n"
-                "\n"
-                "[m3]\n"
                 "\n"
                 "[m1-1]\n"
                 "\n"
