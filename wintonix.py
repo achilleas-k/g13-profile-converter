@@ -18,6 +18,8 @@
 import xml.etree.ElementTree as ET
 import sys
 import os.path
+import getpass
+from zipfile import ZipFile
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 KEYDEF_FILE = os.path.join(SCRIPT_DIR, "keydef.cfg")
@@ -133,25 +135,24 @@ def assign_macros(macros, assignments):
 def build_macro_file_text(profile_name, assignments):
     print("Building output ...")
     macros_file_text = (
-                "[DEFAULT]\n"
-                "name = %s\n"
-                "version = 1.0\n"
-                "icon = \n"
-                "window_name =\n"
-                "base_profile = \n"
-                "background = \n"
-                "author = \n"
-                "activate_on_focus = False\n"
-                "plugins_mode = all\n"
-                "selected_plugins = ,profiles,menu\n"
-                "send_delays = True\n"
-                "fixed_delays = False\n"
-                "press_delay = 50\n"
-                "release_delay = 50\n"
-                "models = g13\n"
-                "\n"
-                "[m1]\n"
-                        % (profile_name))
+                "[DEFAULT]\n"+
+                "name = %s\n" % (profile_name)+
+                "version = 1.0\n"+
+                "icon = \n"+
+                "window_name =\n"+
+                "base_profile = \n"+
+                "background = \n"+
+                "author = %s\n" % (getpass.getuser())+
+                "activate_on_focus = False\n"+
+                "plugins_mode = all\n"+
+                "selected_plugins = ,profiles,menu\n"+
+                "send_delays = True\n"+
+                "fixed_delays = False\n"+
+                "press_delay = 50\n"+
+                "release_delay = 50\n"+
+                "models = g13\n"+
+                "\n"+
+                "[m1]\n")
     for ta in assignments:
         macros_file_text += ta
     # TODO: Grab backlight colour too
@@ -181,7 +182,8 @@ def save_macro_file(filename, macros_file_text):
     print("Writing Linux .macros file ...")
     # TODO: Ask about overwriting or supplying new name
     output_file_name_base = os.path.splitext(filename)[0]
-    output_file_name = output_file_name_base+".macros"
+    macros_file_name = output_file_name_base+".macros"
+    output_file_name = output_file_name_base+".mzip"
     while os.path.exists(output_file_name):
         print("WARNING: file \"%s\" already exists: " % (output_file_name))
         overwrite = "_"
@@ -191,8 +193,8 @@ def save_macro_file(filename, macros_file_text):
             output_file_name = raw_input("Enter new filename: ")
         elif overwrite in "yY":
             os.remove(output_file_name)
-    with open(output_file_name, 'w') as of:
-        of.write(macros_file_text)
+    with ZipFile(output_file_name, 'w') as of:
+        of.writestr(macros_file_name, macros_file_text)
     print("Profile written to \"%s\"" % output_file_name)
 
 if __name__=="__main__":
