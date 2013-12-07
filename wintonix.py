@@ -235,7 +235,8 @@ def setupOptionParser():
             help=("keydef file: mappings from the Windows XML file to"
                 " the corresponding Gnome15 key names (default: %default)"),
             metavar="KEYDEF", default="keydef.cfg")
-    parser.add_option("-v", action="store_true", dest="verbose")
+    parser.add_option("-v", action="store_true", dest="verbose",
+            help="enable verbose output")
     parser.usage = "usage: %prog [options] filename"
     return parser
 
