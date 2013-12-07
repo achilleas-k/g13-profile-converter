@@ -241,6 +241,9 @@ def setupOptionParser():
 
 
 if __name__=="__main__":
+    # TODO: Output file option
+    # TODO: Update readme
+    # TODO: Default destination dir should be rundir
     parser = setupOptionParser()
     (options, args) = parser.parse_args()
     if not options.verbose:
