@@ -41,3 +41,5 @@ nosetests.xml
 
 # vim swap files
 *.swp
+
+tags
