@@ -84,9 +84,12 @@ def get_macros(macros_elem):
     for macro_el in macros_elem:
         newmacro = {}
         newmacro['name'] = macro_el.get('name')
+        verboseprint("New macro: %s" % (newmacro['name']))
         newmacro['guid'] = macro_el.get('guid')
+        verboseprint("\tguid: %s" % (newmacro['guid']))
         for mec in macro_el.getchildren():
             newmacro['type'] = mec.tag
+            verboseprint("\tmacro type: %s" % (newmacro['type']))
             newmacro['keyseq'] = []
             # TODO: separate types:
             #       - keystroke
@@ -95,6 +98,7 @@ def get_macros(macros_elem):
             #       - mousefunction
             for mecc in mec.getchildren():
                 newmacro['keyseq'].append(mecc.get('value'))
+            verboseprint("\tkeyseq: %s" % (newmacro['keyseq']))
         macros.append(newmacro)
     return macros
 
@@ -179,7 +183,6 @@ def build_macro_file_text(profile_name, assignments):
                 "[m3]\n"+
                 assignments['m3']+
 
-    # TODO: Grab backlight colour too
                 "\n"
                 "[m1-1]\n"
                 "\n"
@@ -188,7 +191,6 @@ def build_macro_file_text(profile_name, assignments):
                 "[m3-1]\n"
                 "\n"
                 "[m1-2]\n"
-                "backlight_color = 11,0,255\n" # TODO: Why is this here?
                 "\n"
                 "[m2-2]\n"
                 "\n"
@@ -220,15 +222,17 @@ def save_macro_file(filename, macros_file_text):
 
 def setupOptionParser():
     parser = OptionParser()
-    parser.add_option("-i", "--input",
-            action="store", type="string", dest="filename",
-            help="input file name (Windows XML)", metavar="FILE")
+    # best make the input filename a positional arg
+    #parser.add_option("-i", "--input",
+    #        action="store", type="string", dest="filename",
+    #        help="input file name (Windows XML)", metavar="FILE")
     parser.add_option("-k", "--keydef",
             action="store", type="string", dest="keydef",
             help=("keydef file: mappings from the Windows XML file to"
                 " the corresponding Gnome15 key names (default: %default)"),
             metavar="KEYDEF", default="keydef.cfg")
     parser.add_option("-v", action="store_true", dest="verbose")
+    parser.usage = "usage: %prog [options] filename"
     return parser
 
 
@@ -237,15 +241,18 @@ if __name__=="__main__":
     (options, args) = parser.parse_args()
     if not options.verbose:
         verboseprint = lambda *a: None
-    filename = options.filename
+    if len(args) == 0:
+        print("ERROR: No filename supplied.")
+        sys.exit(1)
+    filename = args[0]
     keydef_file = options.keydef
-    load_keydef(keydef_file)
+    keydef = load_keydef(keydef_file)
     elements = get_elements(filename)
     macros_elem = elements['macros']
     macros = get_macros(macros_elem)
     assignments_elem = elements['assignments']
     assignments = get_assignments(assignments_elem)
-    macro_assignments = assign_macros(macros, assignments)
+    macro_assignments = assign_macros(macros, assignments, keydef)
     profile_name = elements['pname']
     file_contents = build_macro_file_text(profile_name, macro_assignments)
     save_macro_file(filename, file_contents)
