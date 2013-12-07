@@ -19,6 +19,7 @@ g15-connfig.
 
 
 Options:
+
   -h, --help            show this help message and exit
   -k KEYDEF, --keydef=KEYDEF
                         keydef file: mappings from the Windows XML file to the
