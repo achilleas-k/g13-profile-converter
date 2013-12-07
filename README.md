@@ -20,10 +20,10 @@ g15-connfig.
 
 Options:
 
-    -h, --help            show this help message and exit
+    -h, --help              show this help message and exit
     -k KEYDEF, --keydef=KEYDEF
-                        keydef file: mappings from the Windows XML file to the
-                        corresponding Gnome15 key names (default: keydef.cfg)
-    -v                    enable verbose output
+                            keydef file: mappings from the Windows XML file to the
+                            corresponding Gnome15 key names (default: keydef.cfg)
+    -v                      enable verbose output
 
 
