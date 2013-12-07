@@ -20,13 +20,22 @@ import sys
 import os.path
 import getpass
 from zipfile import ZipFile
+from optparse import OptionParser
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-KEYDEF_FILE = os.path.join(SCRIPT_DIR, "keydef.cfg")
-KEYDEF = {}
 
-def load_keydef(KEYDEF_FILE):
-    deflines = open(KEYDEF_FILE, 'r').readlines()  # TODO: Check if file exists
+def verboseprint(output):
+    print(output)
+
+
+def load_keydef(keydef_file):
+    if not os.path.isfile(keydef_file):
+        print("Error: Keydef file %s does not exist or is not a valid file." % (
+            keydef_file))
+        sys.exit(2)
+    deflines = open(keydef_file, 'r').readlines()
+    verboseprint("Keydef file %s loaded successfully." % (keydef_file))
+    keydef = {}
     for dl in deflines:
         dl = dl.strip()
         if dl.startswith("#") or not dl:
@@ -34,17 +43,22 @@ def load_keydef(KEYDEF_FILE):
         winkey, linuxkey = dl.split(':')
         winkey = winkey.strip()
         linuxkey = linuxkey.strip()
-        KEYDEF[winkey] = linuxkey
-    return
+        keydef[winkey] = linuxkey
+    return keydef
 
 
 def get_elements(filename):
+    if not os.path.isfile(filename):
+        print("Error: input file %s does not exist.")
+        sys.exit(2)
     print("\n\nParsing %s" % filename)
     tree = ET.parse(filename)
     root = tree.getroot()
     profile = root[0]
+    verboseprint(profile)
     profile_name = profile.attrib['name']
     profile_id = profile.attrib['guid']
+    verboseprint("Profile name: %s, ID: %s" % (profile_name, profile_id))
     macros_elem = None
     assignments_elem = None
     backlight_elem = None
@@ -62,6 +76,7 @@ def get_elements(filename):
             'assignments': assignments_elem,
             'backlight': backlight_elem,
             }
+
 
 def get_macros(macros_elem):
     print("Building macro list ...")
@@ -83,6 +98,7 @@ def get_macros(macros_elem):
         macros.append(newmacro)
     return macros
 
+
 def get_assignments(assignments_elem):
     print("Building assingment list ...")
     assignments = []
@@ -94,7 +110,8 @@ def get_assignments(assignments_elem):
         assignments.append(newassign)
     return assignments
 
-def assign_macros(macros, assignments):
+
+def assign_macros(macros, assignments, keydef):
     macro_indexer = dict((macro['guid'], i) for i, macro in enumerate(macros))
     #assign_indexer = dict((assign['guid'], i) for i, assign in enumerate(assignments))
     print("Merging lists ...")
@@ -113,8 +130,8 @@ def assign_macros(macros, assignments):
             # macro may not be assigned to key sequence
             # NOTE: Just taking the first one for now
             firstkey = cur_macro['keyseq'][0]
-            if KEYDEF.has_key(firstkey):
-                cur_kkey = KEYDEF[firstkey]
+            if keydef.has_key(firstkey):
+                cur_kkey = keydef[firstkey]
             else:
                 cur_kkey = "KEY_"+firstkey
             cur_name = cur_macro['name']
@@ -133,6 +150,7 @@ def assign_macros(macros, assignments):
 
             target_assignments[bank]+=configstring
     return target_assignments
+
 
 def build_macro_file_text(profile_name, assignments):
     print("Building output ...")
@@ -179,6 +197,7 @@ def build_macro_file_text(profile_name, assignments):
             )
     return macros_file_text
 
+
 def save_macro_file(filename, macros_file_text):
     print("Writing Linux .macros file ...")
     # TODO: Ask about overwriting or supplying new name
@@ -198,9 +217,29 @@ def save_macro_file(filename, macros_file_text):
         of.writestr(macros_file_name, macros_file_text)
     print("Profile written to \"%s\"" % output_file_name)
 
+
+def setupOptionParser():
+    parser = OptionParser()
+    parser.add_option("-i", "--input",
+            action="store", type="string", dest="filename",
+            help="input file name (Windows XML)", metavar="FILE")
+    parser.add_option("-k", "--keydef",
+            action="store", type="string", dest="keydef",
+            help=("keydef file: mappings from the Windows XML file to"
+                " the corresponding Gnome15 key names (default: %default)"),
+            metavar="KEYDEF", default="keydef.cfg")
+    parser.add_option("-v", action="store_true", dest="verbose")
+    return parser
+
+
 if __name__=="__main__":
-    filename = sys.argv[1]  # TODO: check cl arguments
-    load_keydef(KEYDEF_FILE)
+    parser = setupOptionParser()
+    (options, args) = parser.parse_args()
+    if not options.verbose:
+        verboseprint = lambda *a: None
+    filename = options.filename
+    keydef_file = options.keydef
+    load_keydef(keydef_file)
     elements = get_elements(filename)
     macros_elem = elements['macros']
     macros = get_macros(macros_elem)
@@ -210,9 +249,6 @@ if __name__=="__main__":
     profile_name = elements['pname']
     file_contents = build_macro_file_text(profile_name, macro_assignments)
     save_macro_file(filename, file_contents)
-
-
-
 
 
 
