@@ -111,6 +111,10 @@ def get_assignments(assignments_elem):
         newassign['gkey'] = assign_el.get('contextid')
         newassign['bank'] = 'm'+assign_el.get('shiftstate')
         newassign['guid'] = assign_el.get('macroguid')
+        verboseprint("New assignment:\n"+
+                "Key: %s\n" % (newassign['gkey'])+
+                "Bank: %s\n" % (newassign['bank'])+
+                "Macro guid: %s\n" % (newassign['guid']))
         assignments.append(newassign)
     return assignments
 
