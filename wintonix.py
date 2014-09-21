@@ -27,7 +27,6 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 def verboseprint(output):
     print(output)
 
-
 def load_keydef(keydef_file):
     if not os.path.isfile(keydef_file):
         print("Error: Keydef file %s does not exist or is not a valid file." % (
@@ -45,7 +44,6 @@ def load_keydef(keydef_file):
         linuxkey = linuxkey.strip()
         keydef[winkey] = linuxkey
     return keydef
-
 
 def get_elements(filename):
     if not os.path.isfile(filename):
@@ -77,7 +75,6 @@ def get_elements(filename):
             'backlight': backlight_elem,
             }
 
-
 def get_macros(macros_elem):
     print("Building macro list ...")
     macros = []
@@ -87,6 +84,7 @@ def get_macros(macros_elem):
         verboseprint("New macro: %s" % (newmacro['name']))
         newmacro['guid'] = macro_el.get('guid')
         verboseprint("\tguid: %s" % (newmacro['guid']))
+        # TODO: Handle XMLNS (xml namespace); i.e., REMOVE
         for mec in macro_el.getchildren():
             newmacro['type'] = mec.tag
             verboseprint("\tmacro type: %s" % (newmacro['type']))
@@ -102,7 +100,6 @@ def get_macros(macros_elem):
         macros.append(newmacro)
     return macros
 
-
 def get_assignments(assignments_elem):
     print("Building assingment list ...")
     assignments = []
@@ -112,12 +109,11 @@ def get_assignments(assignments_elem):
         newassign['bank'] = 'm'+assign_el.get('shiftstate')
         newassign['guid'] = assign_el.get('macroguid')
         verboseprint("New assignment:\n"+
-                "Key: %s\n" % (newassign['gkey'])+
-                "Bank: %s\n" % (newassign['bank'])+
-                "Macro guid: %s\n" % (newassign['guid']))
+                "\tKey: %s\n" % (newassign['gkey'])+
+                "\tBank: %s\n" % (newassign['bank'])+
+                "\tMacro guid: %s\n" % (newassign['guid']))
         assignments.append(newassign)
     return assignments
-
 
 def assign_macros(macros, assignments, keydef):
     macro_indexer = dict((macro['guid'], i) for i, macro in enumerate(macros))
@@ -134,7 +130,9 @@ def assign_macros(macros, assignments, keydef):
         cur_gkey = assign['gkey'].lower()
         bank = assign['bank']
         cur_kkey = ''
-        if 'keyseq' in cur_macro and cur_macro['keyseq'][0] is not None:
+        if (    'keyseq' in cur_macro and
+                len(cur_macro['keyseq']) and
+                cur_macro['keyseq'][0] is not None):
             # macro may not be assigned to key sequence
             # NOTE: Just taking the first one for now
             firstkey = cur_macro['keyseq'][0]
@@ -158,7 +156,6 @@ def assign_macros(macros, assignments, keydef):
 
             target_assignments[bank]+=configstring
     return target_assignments
-
 
 def build_macro_file_text(profile_name, assignments):
     print("Building output ...")
@@ -203,15 +200,14 @@ def build_macro_file_text(profile_name, assignments):
             )
     return macros_file_text
 
-
 def save_macro_file(filename, macros_file_text):
     print("Writing Linux .macros file ...")
-    # TODO: Ask about overwriting or supplying new name
-    output_file_name_base = os.path.splitext(filename)[0]
+    output_file_name_base = os.path.split(filename)[-1]
+    output_file_name_base = os.path.splitext(output_file_name_base)[0]
     macros_file_name = output_file_name_base+".macros"
     output_file_name = output_file_name_base+".mzip"
     while os.path.exists(output_file_name):
-        print("WARNING: file \"%s\" already exists: " % (output_file_name))
+        print("\"%s\" already exists: " % (output_file_name))
         overwrite = "_"
         while overwrite not in "yYnN":
             overwrite = raw_input("Overwrite file? [y/n] ")
@@ -223,13 +219,8 @@ def save_macro_file(filename, macros_file_text):
         of.writestr(macros_file_name, macros_file_text)
     print("Profile written to \"%s\"" % output_file_name)
 
-
 def setupOptionParser():
     parser = OptionParser()
-    # best make the input filename a positional arg
-    #parser.add_option("-i", "--input",
-    #        action="store", type="string", dest="filename",
-    #        help="input file name (Windows XML)", metavar="FILE")
     parser.add_option("-k", "--keydef",
             action="store", type="string", dest="keydef",
             help=("keydef file: mappings from the Windows XML file to"
@@ -242,9 +233,7 @@ def setupOptionParser():
 
 
 if __name__=="__main__":
-    # TODO: Output file option
     # TODO: Update readme
-    # TODO: Default destination dir should be rundir
     parser = setupOptionParser()
     (options, args) = parser.parse_args()
     if not options.verbose:
