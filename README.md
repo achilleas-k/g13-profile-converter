@@ -16,7 +16,7 @@ profile manager.
 The script generates a file with the same basename as PROFILE and the extension
 `.mzip`, a zip archive which conains the converted .macros profile. The output
 file can be imported into g15-config, the key configuration utility of the
-[Gnome15 project][https://projects.russo79.com/projects/gnome15]
+[Gnome15 project](https://projects.russo79.com/projects/gnome15)
 
 
 Options:
@@ -29,4 +29,4 @@ Options:
 
 
 ### TODO
-Secondary output format for [ecraven/g13][https://github.com/ecraven/g13].
+Secondary output format for [ecraven/g13](https://github.com/ecraven/g13).
