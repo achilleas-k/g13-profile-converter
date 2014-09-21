@@ -28,5 +28,5 @@ Options:
     -v                      enable verbose output
 
 
-### TODO
+### TO-DO
 Secondary output format for [ecraven/g13](https://github.com/ecraven/g13).
