@@ -8,14 +8,15 @@ Gnome15 suite.
 
 USAGE:
 
-    python wintonix.py [options] profile.xml
+    python wintonix.py [options] PROFILE
 
-where `profile.xml` is a game profile exported from the Windows G13 profile
-manager.
+where PROFILE is a game profile (XML format) exported from the Windows G13
+profile manager.
 
-The script generates a file called `profile.mzip`, a zip archive which
-conains the converted .macros profile and can be imported into
-g15-connfig.
+The script generates a file with the same basename as PROFILE and the extension
+`.mzip`, a zip archive which conains the converted .macros profile. The output
+file can be imported into g15-config, the key configuration utility of the
+[Gnome15 project][https://projects.russo79.com/projects/gnome15]
 
 
 Options:
@@ -27,3 +28,5 @@ Options:
     -v                      enable verbose output
 
 
+### TODO
+Secondary output format for [ecraven/g13][https://github.com/ecraven/g13].
