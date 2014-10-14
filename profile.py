@@ -17,13 +17,10 @@ class Profile:
         self.g15text = None
         self.bindtext = None
 
-    def save_bind(self):
-        """
-        Save the configuration as a `.bind` file, which can be used with the
-        ecraven userspace driver (https://github.com/ecraven/g13).
-        """
-
     def build_macro_file_text(self):
+        """
+        Construct the file text for the Gnome15 configuration file.
+        """
         print("Building output ...")
         macros_file_text = (
             "[DEFAULT]\n"+
@@ -90,4 +87,35 @@ class Profile:
             of.writestr(macros_file_name, text)
         print("Profile written to \"%s\"" % output_file_name)
 
+    def build_bind_file_text(self):
+        """
+        Construct the file text for the ecraven bind file.
+        """
+        text = ""
+        for key, binding in self.assignments:
+            text += "bind "+key.upper()+binding.upper()+"\n"
+        self.bindtext = text
 
+    def save_bind(self, filename):
+        """
+        Save the configuration as a `.bind` file, which can be used with the
+        ecraven userspace driver (https://github.com/ecraven/g13).
+        """
+        self.build_bind_file_text()
+        text = self.bindtext
+        print("Writing ecraven .bind file ...")
+        output_file_name_base = os.path.split(filename)[-1]
+        output_file_name_base = os.path.splitext(output_file_name_base)[0]
+        output_file_name = output_file_name_base+".bind"
+        while os.path.exists(output_file_name):
+            print("\"%s\" already exists: " % (output_file_name))
+            overwrite = "_"
+            while overwrite not in "yYnN":
+                overwrite = input("Overwrite file? [y/n] ")
+            if overwrite in "nN":
+                output_file_name = input("Enter new filename: ")
+            elif overwrite in "yY":
+                os.remove(output_file_name)
+        with open(output_file_name, 'w') as of:
+            of.write(text)
+        print("Profile written to \"%s\"" % output_file_name)

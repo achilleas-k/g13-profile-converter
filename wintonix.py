@@ -158,13 +158,18 @@ def assign_macros(macros, assignments, keydef):
 
 def setupOptionParser():
     parser = OptionParser()
-    parser.add_option("-k", "--keydef",
-            action="store", type="string", dest="keydef",
-            help=("keydef file: mappings from the Windows XML file to"
-                " the corresponding Gnome15 key names (default: %default)"),
-            metavar="KEYDEF", default="keydef.cfg")
+    parser.add_option("-f", "--format", action="store",
+                      type="string", dest="format",
+                      help=("output format: valid values are "
+                            "\"mzip\" and \"bind\" (default: bind)"),
+                      metavar="FORMAT", default="bind")
+    parser.add_option("-k", "--keydef", action="store",
+                      type="string", dest="keydef",
+                      help=("keydef file: mappings from the Windows XML file to"
+                            " the corresponding Gnome15 key names (default: %default)"),
+                      metavar="KEYDEF", default="keydef.cfg")
     parser.add_option("-v", action="store_true", dest="verbose",
-            help="enable verbose output")
+                      help="enable verbose output")
     parser.usage = "usage: %prog [options] filename"
     return parser
 
@@ -181,6 +186,11 @@ if __name__=="__main__":
     filename = args[0]
     keydef_file = options.keydef
     keydef = load_keydef(keydef_file)
+    outfmt = options.format
+    if outfmt not in ["bind", "mzip"]:
+        print("ERROR: Invalid format specified (%s)" % outfmt,
+              file=sys.stderr)
+        sys.exit(2)
     elements = get_elements(filename)
     macros_elem = elements['macros']
     macros = get_macros(macros_elem)
@@ -190,7 +200,8 @@ if __name__=="__main__":
     profile_name = elements['pname']
     profile = Profile(name=elements['pname'], profile_id=elements['pid'],
                       assignments=macro_assignments)
-    profile.save_gnome15(filename)
-
-
+    if outfmt == "bind":
+        profile.save_bind(filename)
+    elif outfmt == "mzip":
+        profile.save_gnome15(filename)
 

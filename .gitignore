@@ -38,6 +38,7 @@ nosetests.xml
 *.mzip
 *.macros
 *.xml
+*.bind
 
 # vim swap files
 *.swp
