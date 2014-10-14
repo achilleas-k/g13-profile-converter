@@ -18,14 +18,13 @@
 import xml.etree.ElementTree as ET
 import sys
 import os.path
-import getpass
-from zipfile import ZipFile
 from optparse import OptionParser
+from profile import Profile
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 def verboseprint(output):
-    print(output)
+    print(output, file=sys.stderr)
 
 def load_keydef(keydef_file):
     if not os.path.isfile(keydef_file):
@@ -136,7 +135,7 @@ def assign_macros(macros, assignments, keydef):
             # macro may not be assigned to key sequence
             # NOTE: Just taking the first one for now
             firstkey = cur_macro['keyseq'][0]
-            if keydef.has_key(firstkey):
+            if firstkey in keydef:
                 cur_kkey = keydef[firstkey]
             else:
                 cur_kkey = "KEY_"+firstkey
@@ -157,68 +156,6 @@ def assign_macros(macros, assignments, keydef):
             target_assignments[bank]+=configstring
     return target_assignments
 
-def build_macro_file_text(profile_name, assignments):
-    print("Building output ...")
-    macros_file_text = (
-                "[DEFAULT]\n"+
-                "name = %s\n" % (profile_name)+
-                "version = 1.0\n"+
-                "icon = \n"+
-                "window_name =\n"+
-                "base_profile = \n"+
-                "background = \n"+
-                "author = %s\n" % (getpass.getuser())+
-                "activate_on_focus = False\n"+
-                "plugins_mode = all\n"+
-                "selected_plugins = ,profiles,menu\n"+
-                "send_delays = True\n"+
-                "fixed_delays = False\n"+
-                "press_delay = 50\n"+
-                "release_delay = 50\n"+
-                "models = g13\n"+
-                "\n"+
-                "[m1]\n"+
-                assignments['m1']+
-                "[m2]\n"+
-                assignments['m2']+
-                "[m3]\n"+
-                assignments['m3']+
-
-                "\n"
-                "[m1-1]\n"
-                "\n"
-                "[m2-1]\n"
-                "\n"
-                "[m3-1]\n"
-                "\n"
-                "[m1-2]\n"
-                "\n"
-                "[m2-2]\n"
-                "\n"
-                "[m3-2]\n"
-                "\n\n"
-            )
-    return macros_file_text
-
-def save_macro_file(filename, macros_file_text):
-    print("Writing Linux .macros file ...")
-    output_file_name_base = os.path.split(filename)[-1]
-    output_file_name_base = os.path.splitext(output_file_name_base)[0]
-    macros_file_name = output_file_name_base+".macros"
-    output_file_name = output_file_name_base+".mzip"
-    while os.path.exists(output_file_name):
-        print("\"%s\" already exists: " % (output_file_name))
-        overwrite = "_"
-        while overwrite not in "yYnN":
-            overwrite = raw_input("Overwrite file? [y/n] ")
-        if overwrite in "nN":
-            output_file_name = raw_input("Enter new filename: ")
-        elif overwrite in "yY":
-            os.remove(output_file_name)
-    with ZipFile(output_file_name, 'w') as of:
-        of.writestr(macros_file_name, macros_file_text)
-    print("Profile written to \"%s\"" % output_file_name)
-
 def setupOptionParser():
     parser = OptionParser()
     parser.add_option("-k", "--keydef",
@@ -235,7 +172,7 @@ def setupOptionParser():
 if __name__=="__main__":
     # TODO: Update readme
     parser = setupOptionParser()
-    (options, args) = parser.parse_args()
+    options, args = parser.parse_args()
     if not options.verbose:
         verboseprint = lambda *a: None
     if len(args) == 0:
@@ -251,8 +188,9 @@ if __name__=="__main__":
     assignments = get_assignments(assignments_elem)
     macro_assignments = assign_macros(macros, assignments, keydef)
     profile_name = elements['pname']
-    file_contents = build_macro_file_text(profile_name, macro_assignments)
-    save_macro_file(filename, file_contents)
+    profile = Profile(name=elements['pname'], profile_id=elements['pid'],
+                      assignments=macro_assignments)
+    profile.save_gnome15(filename)
 
 
 
