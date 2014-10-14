@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET
 import sys
 import os.path
 from optparse import OptionParser
-from profile import Profile
+from g13profile import G13Profile
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -129,7 +129,7 @@ def assign_macros(macros, assignments, keydef):
         cur_gkey = assign['gkey'].lower()
         bank = assign['bank']
         cur_kkey = ''
-        if (    'keyseq' in cur_macro and
+        if ('keyseq' in cur_macro and
                 len(cur_macro['keyseq']) and
                 cur_macro['keyseq'][0] is not None):
             # macro may not be assigned to key sequence
@@ -198,10 +198,12 @@ if __name__=="__main__":
     assignments = get_assignments(assignments_elem)
     macro_assignments = assign_macros(macros, assignments, keydef)
     profile_name = elements['pname']
-    profile = Profile(name=elements['pname'], profile_id=elements['pid'],
+    bindingobj = G13Profile(name=elements['pname'], profile_id=elements['pid'],
                       assignments=macro_assignments)
     if outfmt == "bind":
-        profile.save_bind(filename)
+        bindingobj.save_bind(filename)
     elif outfmt == "mzip":
-        profile.save_gnome15(filename)
+        bindingobj.save_gnome15(filename)
 
+    import IPython
+    IPython.embed()

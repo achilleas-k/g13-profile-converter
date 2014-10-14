@@ -6,8 +6,9 @@ This object holds the internal representation for a loaded profile.
 import os
 from zipfile import ZipFile
 import getpass
+import xml.etree.ElementTree as ET
 
-class Profile:
+class G13Profile(object):
     def __init__(self, name=None, profile_id=None, assignments={},
                  backlight=None):
         self.name = name
@@ -16,6 +17,33 @@ class Profile:
         self.backlight = backlight
         self.g15text = None
         self.bindtext = None
+
+    @staticmethod
+    def _find_assignments(macros_elem, assignments_elem):
+        """
+        Matches macros with assignments
+        """
+
+
+    def parse_windows_xml(self, xmlstring):
+        """
+        Parses windows configuration XML string and stores the information in
+        the appropriate attributes.
+        """
+        root = ET.fromstring(xmlstring)
+        xmlprofile = root[0]
+        self.name = xmlprofile.attrib['name']
+        self.profile_id = xmlprofile.attrib['guid']
+        macros_elem = None
+        assignments_elem = None
+        for pchild in xmlprofile:
+            if "macros" in pchild.tag:
+                macros_elem = pchild
+            elif "assignments" in pchild.tag:
+                assignments_elem = pchild
+            elif "backlight" in pchild.tag:
+                self.backlight = pchild
+        self.assignments = self.find_assignments(macros_elem, assignments_elem)
 
     def build_macro_file_text(self):
         """
@@ -93,7 +121,7 @@ class Profile:
         """
         text = ""
         for key, binding in self.assignments:
-            text += "bind "+key.upper()+binding.upper()+"\n"
+            text += "bind "+key.upper()+" "+binding.upper()+"\n"
         self.bindtext = text
 
     def save_bind(self, filename):
