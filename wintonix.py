@@ -158,11 +158,18 @@ def assign_macros(macros, assignments, keydef):
 
 def setupOptionParser():
     parser = OptionParser()
-    parser.add_option("-f", "--format", action="store",
+    parser.add_option("--format", action="store",
                       type="string", dest="format",
                       help=("output format: valid values are "
-                            "\"mzip\" and \"bind\" (default: bind)"),
-                      metavar="FORMAT", default="bind")
+                            "\"mzip\" and \"bind\" (default: mzip)"),
+                      metavar="FORMAT", default="mzip")
+    parser.add_option("-f", "--force", action="store_true", dest="force",
+                      help=("force overwrite: overwrite destination file "
+                            "without asking"))
+    parser.add_option("-o", "--output", action="store",
+                      type="string", dest="outfile",
+                      help=("output file: destination file (defaults to input "
+                            "file basename with appropriate extension)"))
     parser.add_option("-k", "--keydef", action="store",
                       type="string", dest="keydef",
                       help=("keydef file: mappings from the Windows XML file to"
@@ -187,6 +194,11 @@ if __name__=="__main__":
     keydef_file = options.keydef
     keydef = load_keydef(keydef_file)
     outfmt = options.format
+    outfilename = options.outfile
+    # TODO: Handle other options
+    if outfilename is None:
+        outfilename = filename
+        # TODO: Handle extension(s)
     if outfmt not in ["bind", "mzip"]:
         print("ERROR: Invalid format specified (%s)" % outfmt,
               file=sys.stderr)
@@ -201,9 +213,6 @@ if __name__=="__main__":
     bindingobj = G13Profile(name=elements['pname'], profile_id=elements['pid'],
                       assignments=macro_assignments)
     if outfmt == "bind":
-        bindingobj.save_bind(filename)
+        bindingobj.save_bind(outfilename)
     elif outfmt == "mzip":
-        bindingobj.save_gnome15(filename)
-
-    import IPython
-    IPython.embed()
+        bindingobj.save_gnome15(outfilename)
