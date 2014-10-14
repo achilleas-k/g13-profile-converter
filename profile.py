@@ -48,21 +48,21 @@ class Profile:
             macros_file_text += (
                 "[%s]\n%s\n" % (mstr, self.assignments[mstr])
             )
-        #macros_file_text += (
-        #    "\n"
-        #    "[m1-1]\n"
-        #    "\n"
-        #    "[m2-1]\n"
-        #    "\n"
-        #    "[m3-1]\n"
-        #    "\n"
-        #    "[m1-2]\n"
-        #    "\n"
-        #    "[m2-2]\n"
-        #    "\n"
-        #    "[m3-2]\n"
-        #    "\n\n"
-        #)
+        macros_file_text += (
+            "\n"
+            "[m1-1]\n"
+            "\n"
+            "[m2-1]\n"
+            "\n"
+            "[m3-1]\n"
+            "\n"
+            "[m1-2]\n"
+            "\n"
+            "[m2-2]\n"
+            "\n"
+            "[m3-2]\n"
+            "\n\n"
+        )
         self.g15text = macros_file_text
 
     def save_gnome15(self, filename):
