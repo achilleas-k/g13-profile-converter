@@ -104,7 +104,7 @@ class G13Profile(object):
         xmlprofile = root[0]
         self.name = xmlprofile.attrib['name']
         self.profile_id = xmlprofile.attrib['guid']
-        self.author = getpass.getuser
+        self.author = getpass.getuser()
         macros_elem = None
         assignments_elem = None
         for pchild in xmlprofile:
