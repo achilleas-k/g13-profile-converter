@@ -23,6 +23,40 @@ class G13Profile(object):
         """
         Matches macros with assignments
         """
+        macros = G13Profile._get_macros(macros_elem)
+        assignments = G13Profile._get_assignments(assignments_elem)
+
+    def _get_macros(elements):
+        print("Building macro list ...")
+        macros = []
+        for macro_el in elements:
+            newmacro = {}
+            newmacro['name'] = macro_el.get('name')
+            newmacro['guid'] = macro_el.get('guid')
+            # TODO: Handle XMLNS (xml namespace); i.e., REMOVE
+            for mec in macro_el.getchildren():
+                newmacro['type'] = mec.tag
+                newmacro['keyseq'] = []
+                # TODO: separate types:
+                #       - keystroke
+                #       - multikey
+                #       - textblock
+                #       - mousefunction
+                for mecc in mec.getchildren():
+                    newmacro['keyseq'].append(mecc.get('value'))
+            macros.append(newmacro)
+        return macros
+
+    def _get_assignments(elements):
+        print("Building assingment list ...")
+        assignments = []
+        for assign_el in elements:
+            newassign = {}
+            newassign['gkey'] = assign_el.get('contextid')
+            newassign['bank'] = 'm'+assign_el.get('shiftstate')
+            newassign['guid'] = assign_el.get('macroguid')
+            assignments.append(newassign)
+        return assignments
 
 
     def parse_windows_xml(self, xmlstring):
@@ -43,7 +77,7 @@ class G13Profile(object):
                 assignments_elem = pchild
             elif "backlight" in pchild.tag:
                 self.backlight = pchild
-        self.assignments = self.find_assignments(macros_elem, assignments_elem)
+        self.assignments = G13Profile.find_assignments(macros_elem, assignments_elem)
 
     def build_macro_file_text(self):
         """
