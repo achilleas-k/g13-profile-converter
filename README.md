@@ -27,8 +27,6 @@ Options:
     -k KEYDEF, --keydef=KEYDEF
                             keydef file: mappings from the Windows XML file to the
                             corresponding Gnome15 key names (default: keydef.cfg)
-    -v                      enable verbose output
-
 
 Formats
 -------
@@ -42,3 +40,4 @@ Features and limitations
 - Currently, the resulting profile only assigns direct key bindings (`G key : keyboard key/combo`).
 - For the `bind` format, only the first bank, `M1`, is converted, since ecraven's driver doesn't handle bank switching.
 - Macros and other options are planned for the future (for Gnome15).
+- Bindings to the thumbstick as well as the two buttons near the stick are not handled properly.

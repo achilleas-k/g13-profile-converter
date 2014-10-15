@@ -4,28 +4,63 @@ The profile class
 This object holds the internal representation for a loaded profile.
 """
 import os
-from zipfile import ZipFile
+import sys
 import getpass
+from zipfile import ZipFile
 import xml.etree.ElementTree as ET
 
 class G13Profile(object):
-    def __init__(self, name=None, profile_id=None, assignments={},
-                 backlight=None):
-        self.name = name
-        self.profile_id = profile_id
-        self.assignments = assignments
-        self.backlight = backlight
+    def __init__(self, xmlstring, keydef=None):
+        self.keydef = keydef
+        self.parse_windows_xml(xmlstring)
         self.g15text = None
         self.bindtext = None
 
     @staticmethod
-    def _find_assignments(macros_elem, assignments_elem):
+    def _find_assignments(macros_elem, assignments_elem, keydef):
         """
         Matches macros with assignments
         """
+        print("Creating bindings ...")
         macros = G13Profile._get_macros(macros_elem)
         assignments = G13Profile._get_assignments(assignments_elem)
+        macro_indexer = dict((macro['guid'], i) for i, macro in enumerate(macros))
+        #assign_indexer = dict((assign['guid'], i) for i, assign in enumerate(assignments))
+        bank_assignments = {'m1': {}, 'm2': {}, 'm3': {}}
+        for assign in assignments:
+            guid = assign['guid']
+            mindex = macro_indexer.get(guid)
+            if mindex is None:
+                print("WARNING: Macro with guid %s not found" % guid,
+                      file=sys.stderr)
+                continue
+            cur_macro = macros[mindex]
+            cur_gkey = assign['gkey'].lower()
+            bank = assign['bank']
+            cur_kkey = ''
+            if ('keyseq' in cur_macro and
+                    len(cur_macro['keyseq']) and
+                    cur_macro['keyseq'][0] is not None):
+                # macro may not be assigned to key sequence
+                # NOTE: Just taking the first one for now
+                firstkey = cur_macro['keyseq'][0]
+                if firstkey in keydef:
+                    cur_kkey = keydef[firstkey]
+                else:
+                    cur_kkey = "KEY_"+firstkey
+                # TODO: Handle different types
+                cur_type = "mapped-to-key"
+                cur_maptype = "keyboard"
+                cur_name = cur_macro['name']
+                bank_assignments[bank][cur_gkey] = {
+                    "name": cur_name,
+                    "type": cur_type,
+                    "maptype": cur_maptype,
+                    "key": cur_kkey
+                }
+        return bank_assignments
 
+    @staticmethod
     def _get_macros(elements):
         print("Building macro list ...")
         macros = []
@@ -47,6 +82,7 @@ class G13Profile(object):
             macros.append(newmacro)
         return macros
 
+    @staticmethod
     def _get_assignments(elements):
         print("Building assingment list ...")
         assignments = []
@@ -58,16 +94,17 @@ class G13Profile(object):
             assignments.append(newassign)
         return assignments
 
-
     def parse_windows_xml(self, xmlstring):
         """
         Parses windows configuration XML string and stores the information in
         the appropriate attributes.
         """
+        print("Parsing windows XML profile ...")
         root = ET.fromstring(xmlstring)
         xmlprofile = root[0]
         self.name = xmlprofile.attrib['name']
         self.profile_id = xmlprofile.attrib['guid']
+        self.author = getpass.getuser
         macros_elem = None
         assignments_elem = None
         for pchild in xmlprofile:
@@ -77,13 +114,30 @@ class G13Profile(object):
                 assignments_elem = pchild
             elif "backlight" in pchild.tag:
                 self.backlight = pchild
-        self.assignments = G13Profile.find_assignments(macros_elem, assignments_elem)
+        self.assignments = G13Profile._find_assignments(macros_elem,
+                                                       assignments_elem,
+                                                       self.keydef)
 
     def build_macro_file_text(self):
         """
         Construct the file text for the Gnome15 configuration file.
         """
         print("Building output ...")
+        bank_strings = {'m1': '', 'm2': '', 'm3': ''}
+        for bank, gkey_assignment in self.assignments.items():
+            for gkey, assign_info in gkey_assignment.items():
+                configstring =  (
+                        "keys_{gkey}_name = {name}\n"
+                        "keys_{gkey}_type = {type}\n"
+                        "keys_{gkey}_maptype = {maptype}\n"
+                        "keys_{gkey}_mappedkey = {kkey}\n".format(
+                            gkey=gkey, name=assign_info["name"],
+                            type=assign_info["type"],
+                            maptype=assign_info["maptype"],
+                            kkey=assign_info["key"]
+                        )
+                )
+                bank_strings[bank] += configstring
         macros_file_text = (
             "[DEFAULT]\n"+
             "name = %s\n" % (self.name)+
@@ -92,7 +146,7 @@ class G13Profile(object):
             "window_name =\n"+
             "base_profile = \n"+
             "background = \n"+
-            "author = %s\n" % (getpass.getuser())+
+            "author = %s\n" % (self.author)+
             "activate_on_focus = False\n"+
             "plugins_mode = all\n"+
             "selected_plugins = ,profiles,menu\n"+
@@ -102,10 +156,9 @@ class G13Profile(object):
             "release_delay = 50\n"+
             "models = g13\n"
         )
-        for midx in range(1, 4):
-            mstr = "m%i" % midx
+        for bank, configstring in bank_strings.items():
             macros_file_text += (
-                "[%s]\n%s\n" % (mstr, self.assignments[mstr])
+                "[%s]\n%s\n" % (bank, configstring)
             )
         macros_file_text += (
             "\n"
