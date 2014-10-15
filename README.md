@@ -15,6 +15,7 @@ where PROFILE is a game profile (XML format) exported from the Windows G13
 profile manager.
 
 Options:
+
     -h, --help            show this help message and exit
     --format=FORMAT       output format: valid values are "mzip" and "bind"
                         (default: mzip)
