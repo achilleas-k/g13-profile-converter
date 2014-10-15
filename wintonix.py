@@ -46,7 +46,7 @@ def load_keydef(keydef_file):
 
 def get_elements(filename):
     if not os.path.isfile(filename):
-        print("Error: input file %s does not exist.")
+        print("Error: input file %s does not exist." % filename, file=sys.stderr)
         sys.exit(2)
     print("\n\nParsing %s" % filename)
     tree = ET.parse(filename)
