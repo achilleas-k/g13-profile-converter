@@ -209,6 +209,11 @@ class G13Profile(object):
         bank_one = self.assignments["m1"]
         for key, binding in bank_one.items():
             gkey = key
+            # gkey exceptions
+            if gkey.lower() == "g23":
+                gkey = "left"
+            elif gkey.lower() == "g24":
+                gkey = "down"
             kkey = binding["key"]
             text += "bind "+gkey.upper()+" "+kkey.upper()+"\n"
         self.bindtext = text
