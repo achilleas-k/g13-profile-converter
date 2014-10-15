@@ -98,23 +98,21 @@ class G13Profile(object):
         self.build_macro_file_text()
         text = self.g15text
         print("Writing Gnome15 .mzip file ...")
-        output_file_name_base = os.path.split(filename)[-1]
-        output_file_name_base = os.path.splitext(output_file_name_base)[0]
+        output_file_name_base = os.path.splitext(filename)[0]
         macros_file_name = output_file_name_base+".macros"
-        output_file_name = output_file_name_base+".mzip"
         if not force_overwrite:
-            while os.path.exists(output_file_name):
-                print("\"%s\" already exists: " % (output_file_name))
+            while os.path.exists(filename):
+                print("\"%s\" already exists: " % (filename))
                 overwrite = "_"
                 while overwrite not in "yYnN":
                     overwrite = input("Overwrite file? [y/n] ")
                 if overwrite in "nN":
-                    output_file_name = input("Enter new filename: ")
+                    filename = input("Enter new filename: ")
                 elif overwrite in "yY":
-                    os.remove(output_file_name)
-        with ZipFile(output_file_name, 'w') as of:
+                    os.remove(filename)
+        with ZipFile(filename, 'w') as of:
             of.writestr(macros_file_name, text)
-        print("Profile written to \"%s\"" % output_file_name)
+        print("Profile written to \"%s\"" % filename)
 
     def build_bind_file_text(self):
         """
@@ -133,19 +131,16 @@ class G13Profile(object):
         self.build_bind_file_text()
         text = self.bindtext
         print("Writing ecraven .bind file ...")
-        output_file_name_base = os.path.split(filename)[-1]
-        output_file_name_base = os.path.splitext(output_file_name_base)[0]
-        output_file_name = output_file_name_base+".bind"
         if not force_overwrite:
-            while os.path.exists(output_file_name):
-                print("\"%s\" already exists: " % (output_file_name))
+            while os.path.exists(filename):
+                print("\"%s\" already exists: " % (filename))
                 overwrite = "_"
                 while overwrite not in "yYnN":
                     overwrite = input("Overwrite file? [y/n] ")
                 if overwrite in "nN":
-                    output_file_name = input("Enter new filename: ")
+                    filename = input("Enter new filename: ")
                 elif overwrite in "yY":
-                    os.remove(output_file_name)
-        with open(output_file_name, 'w') as of:
+                    os.remove(filename)
+        with open(filename, 'w') as of:
             of.write(text)
-        print("Profile written to \"%s\"" % output_file_name)
+        print("Profile written to \"%s\"" % filename)

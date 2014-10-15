@@ -23,9 +23,6 @@ from g13profile import G13Profile
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-def verboseprint(output):
-    print(output, file=sys.stderr)
-
 def load_keydef(keydef_file):
     if not os.path.isfile(keydef_file):
         print("Error: Keydef file %s does not exist or is not a valid file." % (
@@ -182,12 +179,23 @@ def setupOptionParser():
     parser.usage = "usage: %prog [options] filename"
     return parser
 
+def create_outfilename(inputfile, outfmt, outfilename):
+    if outfilename is None:
+        output_file_name_base = os.path.split(filename)[-1]
+        output_file_name_base = os.path.splitext(output_file_name_base)[0]
+        output_file_name = output_file_name_base+"."+outfmt
+    else:
+        output_file_name = outfilename
+    return output_file_name
+
 
 if __name__=="__main__":
     # TODO: Update readme
     parser = setupOptionParser()
     options, args = parser.parse_args()
-    if not options.verbose:
+    if options.verbose:
+        verboseprint = print
+    else:
         verboseprint = lambda *a: None
     if len(args) == 0:
         print("ERROR: No filename supplied.")
@@ -196,12 +204,8 @@ if __name__=="__main__":
     keydef_file = options.keydef
     keydef = load_keydef(keydef_file)
     outfmt = options.format
-    outfilename = options.outfile
+    outfilename = create_outfilename(filename, outfmt, options.outfile)
     force_overwrite = options.force
-    # TODO: Handle other options
-    if outfilename is None:
-        outfilename = filename
-        # TODO: Handle extension(s)
     if outfmt not in ["bind", "mzip"]:
         print("ERROR: Invalid format specified (%s)" % outfmt,
               file=sys.stderr)
