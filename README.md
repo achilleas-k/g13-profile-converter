@@ -35,9 +35,10 @@ The resulting file is a standard Zip file, but requires the `.mzip` extension to
 
 The `bind` format is intended to be used with [ecraven's userspace driver](https://github.com/ecraven/g13).
 
-Features and limitations
-------------------------
+Limitations (missing features)
+-----------
 - Currently, the resulting profile only assigns direct key bindings (`G key : keyboard key/combo`).
 - For the `bind` format, only the first bank, `M1`, is converted, since ecraven's driver doesn't handle bank switching.
 - Macros and other options are planned for the future (for Gnome15).
 - Bindings to the thumbstick is not handled properly.
+- Backlight colours ignored.
