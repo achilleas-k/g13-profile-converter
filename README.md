@@ -16,18 +16,18 @@ profile manager.
 
 Options:
 
-    -h, --help            show this help message and exit
-    --format=FORMAT       output format: valid values are "mzip" and "bind"
-                        (default: mzip)
-    -f, --force           force overwrite: overwrite destination file without
-                        asking
+    -h, --help              show this help message and exit
+    --format=FORMAT         output format: valid values are "mzip" and "bind"
+                            (default: mzip)
+    -f, --force             force overwrite: overwrite destination file without
+                            asking
     -o OUTFILE, --output=OUTFILE
-                        output file: destination file (defaults to input file
-                        basename with appropriate extension)
+                            output file: destination file (defaults to input file
+                            basename with appropriate extension)
     -k KEYDEF, --keydef=KEYDEF
-                        keydef file: mappings from the Windows XML file to the
-                        corresponding Gnome15 key names (default: keydef.cfg)
-    -v                    enable verbose output
+                            keydef file: mappings from the Windows XML file to the
+                            corresponding Gnome15 key names (default: keydef.cfg)
+    -v                      enable verbose output
 
 
 Formats
