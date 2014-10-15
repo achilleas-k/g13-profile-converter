@@ -29,7 +29,8 @@ def verboseprint(output):
 def load_keydef(keydef_file):
     if not os.path.isfile(keydef_file):
         print("Error: Keydef file %s does not exist or is not a valid file." % (
-            keydef_file))
+            keydef_file),
+              file=sys.stderr)
         sys.exit(2)
     deflines = open(keydef_file, 'r').readlines()
     verboseprint("Keydef file %s loaded successfully." % (keydef_file))
@@ -46,7 +47,8 @@ def load_keydef(keydef_file):
 
 def get_elements(filename):
     if not os.path.isfile(filename):
-        print("Error: input file %s does not exist." % filename, file=sys.stderr)
+        print("Error: input file %s does not exist." % filename,
+              file=sys.stderr)
         sys.exit(2)
     print("\n\nParsing %s" % filename)
     tree = ET.parse(filename)
@@ -195,6 +197,7 @@ if __name__=="__main__":
     keydef = load_keydef(keydef_file)
     outfmt = options.format
     outfilename = options.outfile
+    force_overwrite = options.force
     # TODO: Handle other options
     if outfilename is None:
         outfilename = filename
@@ -213,6 +216,6 @@ if __name__=="__main__":
     bindingobj = G13Profile(name=elements['pname'], profile_id=elements['pid'],
                       assignments=macro_assignments)
     if outfmt == "bind":
-        bindingobj.save_bind(outfilename)
+        bindingobj.save_bind(outfilename, force_overwrite)
     elif outfmt == "mzip":
-        bindingobj.save_gnome15(outfilename)
+        bindingobj.save_gnome15(outfilename, force_overwrite)

@@ -90,7 +90,7 @@ class G13Profile(object):
         )
         self.g15text = macros_file_text
 
-    def save_gnome15(self, filename):
+    def save_gnome15(self, filename, force_overwrite):
         """
         Save the configuration as a `.mzip` file, which can be imported into
         the gnome15 profile editor (https://projects.russo79.com/projects/gnome15)
@@ -102,15 +102,16 @@ class G13Profile(object):
         output_file_name_base = os.path.splitext(output_file_name_base)[0]
         macros_file_name = output_file_name_base+".macros"
         output_file_name = output_file_name_base+".mzip"
-        while os.path.exists(output_file_name):
-            print("\"%s\" already exists: " % (output_file_name))
-            overwrite = "_"
-            while overwrite not in "yYnN":
-                overwrite = input("Overwrite file? [y/n] ")
-            if overwrite in "nN":
-                output_file_name = input("Enter new filename: ")
-            elif overwrite in "yY":
-                os.remove(output_file_name)
+        if not force_overwrite:
+            while os.path.exists(output_file_name):
+                print("\"%s\" already exists: " % (output_file_name))
+                overwrite = "_"
+                while overwrite not in "yYnN":
+                    overwrite = input("Overwrite file? [y/n] ")
+                if overwrite in "nN":
+                    output_file_name = input("Enter new filename: ")
+                elif overwrite in "yY":
+                    os.remove(output_file_name)
         with ZipFile(output_file_name, 'w') as of:
             of.writestr(macros_file_name, text)
         print("Profile written to \"%s\"" % output_file_name)
@@ -124,7 +125,7 @@ class G13Profile(object):
             text += "bind "+key.upper()+" "+binding.upper()+"\n"
         self.bindtext = text
 
-    def save_bind(self, filename):
+    def save_bind(self, filename, force_overwrite):
         """
         Save the configuration as a `.bind` file, which can be used with the
         ecraven userspace driver (https://github.com/ecraven/g13).
@@ -135,15 +136,16 @@ class G13Profile(object):
         output_file_name_base = os.path.split(filename)[-1]
         output_file_name_base = os.path.splitext(output_file_name_base)[0]
         output_file_name = output_file_name_base+".bind"
-        while os.path.exists(output_file_name):
-            print("\"%s\" already exists: " % (output_file_name))
-            overwrite = "_"
-            while overwrite not in "yYnN":
-                overwrite = input("Overwrite file? [y/n] ")
-            if overwrite in "nN":
-                output_file_name = input("Enter new filename: ")
-            elif overwrite in "yY":
-                os.remove(output_file_name)
+        if not force_overwrite:
+            while os.path.exists(output_file_name):
+                print("\"%s\" already exists: " % (output_file_name))
+                overwrite = "_"
+                while overwrite not in "yYnN":
+                    overwrite = input("Overwrite file? [y/n] ")
+                if overwrite in "nN":
+                    output_file_name = input("Enter new filename: ")
+                elif overwrite in "yY":
+                    os.remove(output_file_name)
         with open(output_file_name, 'w') as of:
             of.write(text)
         print("Profile written to \"%s\"" % output_file_name)
