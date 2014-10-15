@@ -206,8 +206,11 @@ class G13Profile(object):
         Construct the file text for the ecraven bind file.
         """
         text = ""
-        for key, binding in self.assignments:
-            text += "bind "+key.upper()+" "+binding.upper()+"\n"
+        bank_one = self.assignments["m1"]
+        for key, binding in bank_one.items():
+            gkey = key
+            kkey = binding["key"]
+            text += "bind "+gkey.upper()+" "+kkey.upper()+"\n"
         self.bindtext = text
 
     def save_bind(self, filename, force_overwrite):
