@@ -40,5 +40,5 @@ The `bind` format is intended to be used with [ecraven's userspace driver](https
 Features and limitations
 ------------------------
 - Currently, the resulting profile only assigns direct key bindings (`G key : keyboard key/combo`).
-- For the `bind` format, only the first bank, `M1` is converted, since ecraven's driver doesn't handle bank switching.
+- For the `bind` format, only the first bank, `M1`, is converted, since ecraven's driver doesn't handle bank switching.
 - Macros and other options are planned for the future (for Gnome15).
