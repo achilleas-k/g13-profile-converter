@@ -40,5 +40,8 @@ Limitations (missing features)
 - Currently, the resulting profile only assigns direct key bindings (`G key : keyboard key/combo`).
 - For the `bind` format, only the first bank, `M1`, is converted, since ecraven's driver doesn't handle bank switching.
 - Macros and other options are planned for the future (for Gnome15).
-- Bindings to the thumbstick is not handled properly.
+- Bindings to the thumbstick are ignored.
+- Key delays (send\_delays, fixed\_delays, press\_delay, release\_delay) are all set to default values for Gnome15 `mzip` profiles.
+    - The values are `True`, `False`, `50` and `50`, respectively.
+    - ecraven's driver doesn't support delays.
 - Backlight colours ignored.
